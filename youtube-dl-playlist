@@ -1,18 +1,18 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # youtube-dl-playlist
-# 
+#
 # Utility to download Youtube playlist videos.
-# 
+# Forked to support python 3 and keep playlist's video order.
+#
 # @author Jordon Mears <jordoncm at gmail dot com>
+# @author Justin Duplessis <duplessisjustin1 at gmail dot com>
 # @license LGPL version 2 or greater <http://www.gnu.org/licenses/lgpl.html>
 
 import sys
-import urllib
-import httplib
+import urllib.request
+import http.client
 import json
 import os
-import shutil
-import tempfile
 import glob
 
 
@@ -22,62 +22,64 @@ class PlaylistDownloader:
     downloaded = 0
 
     def setTarget(self, target):
-        self.targetDir = os.path.realpath(target) + '/';
-        return self.targetDir;
+        self.targetDir = os.path.realpath(target) + '/'
+        return self.targetDir
 
     def download(self, playlistId):
-        print 'Getting playlist information ... '
+        print('Getting playlist information ...')
         data = self.fetchInfo(playlistId)
         self.totalVideos = int(data['feed']['openSearch$totalResults']['$t'])
-        print 'Total videos to download: ' + str(self.totalVideos)
-
-        playlistDir = self.createPath(self.targetDir, data['feed']['title']['$t']);
+        print('Total videos to download: %d'.format(self.totalVideos))
+        title = data['feed']['title']['$t']
+        playlistDir = self.createPath(self.targetDir, title)
         os.chdir(self.setTarget(playlistDir))
 
-        self.downloaded = 1;
+        self.downloaded = 1
         while(self.downloaded <= self.totalVideos):
             data = self.fetchInfo(playlistId, self.downloaded, 50)
             self.downloadEntires(data['feed']['entry'])
 
     def downloadEntires(self, entries):
         for entry in entries:
-            group = entry['media$group'];
-            if self.downloadEntry(group['yt$videoid']['$t'], group['media$title']['$t']):
+            group = entry['media$group']
+            if self.downloadEntry(group['yt$videoid']['$t'],
+            group['media$title']['$t']):
                 self.downloaded = self.downloaded + 1
-            print
 
     def downloadEntry(self, ytId, ytTitle):
-        print ytId + '(' + str(self.downloaded).zfill(3) + '):', ytTitle, '...'
+        print("%s(%s) %s".format(ytId, str(self.downloaded).zfill(3), ytTitle))
 
-        existing = glob.glob('*' + ytId + '.*');
+        existing = glob.glob('*' + ytId + '.*')
         filtered = [x for x in existing if not x.endswith('part')]
         if filtered.__len__() > 0:
-            print 'alreary exists, skipping...'
+            print('alreary exists, skipping...')
             return True
 
         try:
-            os.system('youtube-dl -t --audio-format=best http://www.youtube.com/watch?v=' + ytId)
+            os.system("""youtube-dl -t --audio-format=best
+            http://www.youtube.com/watch?v=""" + ytId)
             return True
 
         except KeyboardInterrupt:
             sys.exit(1)
-        
+
         except Exception as e:
-            print 'failed: ', e.strerror
+            print('failed: %s'.format(e.strerror))
             return False
 
-    def fetchInfo(self, playlistId, start = 1, limit = 0):
-        connection = httplib.HTTPConnection('gdata.youtube.com')
-        connection.request('GET', '/feeds/api/playlists/' + str(playlistId) + '/?' + urllib.urlencode({
-                'alt' : 'json',
-                'max-results' : limit,
-                'start-index' : start,
-                'v' : 2
+    def fetchInfo(self, playlistId, start=1, limit=0):
+        connection = http.client.HTTPConnection('gdata.youtube.com')
+        connection.request('GET', '/feeds/api/playlists/' + str(playlistId) +
+        '/?' + urllib.parse.urlencode({
+                'alt': 'json',
+                'max-results': limit,
+                'start-index': start,
+                'v': 2
             }))
 
         response = connection.getresponse()
         if response.status != 200:
-            print 'Error: Not a valid/public playlist.'
+            print('Error: Not a valid/public playlist.')
             sys.exit(1)
 
         data = response.read()
@@ -88,23 +90,23 @@ class PlaylistDownloader:
         title = title.replace('/', '')
         number = ''
 
-        if os.path.exists(path + title) == True and os.path.isdir(path + title) == False:
-            while(os.path.exists(path + title + str(number)) == True and os.path.isdir(path + title + str(number)) == False):
+        if (os.path.exists(path + title) is True and
+         os.path.isdir(path + title) is False):
+            while(os.path.exists(path + title + str(number)) is True and
+             os.path.isdir(path + title + str(number)) is False):
                 if number == '':
                     number = 0
-
                 number = number + 1
 
-        if os.path.exists(path + title + str(number)) == False:
+        if os.path.exists(path + title + str(number)) is False:
             os.mkdir(path + title + str(number))
 
         return path + title + str(number)
 
 
-
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print 'Usage: youtube-dl-playlist PLAYLIST_ID [DESTINATION_PATH]'
+        print('Usage: youtube-dl-playlist PLAYLIST_ID [DESTINATION_PATH]')
         sys.exit(1)
     else:
         if sys.argv[1][0] == 'P' and sys.argv[1][1] == 'L':
@@ -116,4 +118,4 @@ if __name__ == '__main__':
         downloader.setTarget(sys.argv[2] + '/')
     else:
         downloader.setTarget('./')
-    downloader.download(PLAYLIST_ID);
+    downloader.download(PLAYLIST_ID)
