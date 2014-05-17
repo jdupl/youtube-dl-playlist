@@ -10,11 +10,9 @@ same options and should pick up where it left off.
 
 Forked for Python 3 and keep playlist order in video filenames.
 
-Original author: Jordon Mears <jordoncm at gmail dot com>
 
-Fork author: Justin Duplessis <duplessisjustin1@gmail.com>
 
-Licensed: LGPL version 2 or greater <http://www.gnu.org/licenses/lgpl.html>
+Licensed under LGPL version 2 or greater <http://www.gnu.org/licenses/lgpl.html>
 
 ### Usage
 `youtube-dl-playlist PLAYLIST_ID [DESTINATION_PATH]`
@@ -34,3 +32,10 @@ Download the python file and save to /usr/local/bin/youtube-dl-channel
 Give execute rights
 
 `sudo chmod a+x /usr/local/bin/youtube-dl-playlist`
+
+### Authors
+Original author: Jordon Mears <jordoncm@gmail.com>
+
+Fork author: Justin Duplessis <duplessisjustin1@gmail.com>
+
+See [Github project](https://github.com/jdupl/youtube-dl-playlist/contributors) contributors for a full list.
