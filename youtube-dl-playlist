@@ -17,39 +17,39 @@ import glob
 
 
 class PlaylistDownloader:
-    targetDir = ''
-    totalVideos = 0
+    target_dir = ''
+    total_videos = 0
     downloaded = 0
 
-    def setTarget(self, target):
-        self.targetDir = os.path.realpath(target) + '/'
-        return self.targetDir
+    def set_target(self, target):
+        self.target_dir = os.path.realpath(target) + '/'
+        return self.target_dir
 
-    def download(self, playlistId):
+    def download(self, playlist_id):
         print('Getting playlist information ...')
-        data = self.fetchInfo(playlistId)
-        self.totalVideos = int(data['feed']['openSearch$totalResults']['$t'])
-        print('Total videos to download: %d'.format(self.totalVideos))
+        data = self.fetch_info(playlist_id)
+        self.total_videos = int(data['feed']['openSearch$totalResults']['$t'])
+        print('Total videos to download: %d'.format(self.total_videos))
         title = data['feed']['title']['$t']
-        playlistDir = self.createPath(self.targetDir, title)
-        os.chdir(self.setTarget(playlistDir))
+        playlist_dir = self.create_path(self.target_dir, title)
+        os.chdir(self.set_target(playlist_dir))
 
         self.downloaded = 1
-        while(self.downloaded <= self.totalVideos):
-            data = self.fetchInfo(playlistId, self.downloaded, 50)
-            self.downloadEntires(data['feed']['entry'])
+        while(self.downloaded <= self.total_videos):
+            data = self.fetch_info(playlist_id, self.downloaded, 50)
+            self.download_entires(data['feed']['entry'])
 
-    def downloadEntires(self, entries):
+    def download_entires(self, entries):
         for entry in entries:
             group = entry['media$group']
-            if self.downloadEntry(group['yt$videoid']['$t'],
+            if self.download_entry(group['yt$videoid']['$t'],
             group['media$title']['$t']):
                 self.downloaded = self.downloaded + 1
 
-    def downloadEntry(self, ytId, ytTitle):
-        print("%s(%s) %s".format(ytId, str(self.downloaded).zfill(3), ytTitle))
+    def download_entry(self, yt_id, yt_title):
+        print("%s(%s) %s".format(yt_id, str(self.downloaded).zfill(3), yt_title))
 
-        existing = glob.glob('*' + ytId + '.*')
+        existing = glob.glob('*' + yt_id + '.*')
         filtered = [x for x in existing if not x.endswith('part')]
         if filtered.__len__() > 0:
             print('alreary exists, skipping...')
@@ -57,7 +57,7 @@ class PlaylistDownloader:
 
         try:
             os.system("""youtube-dl -t --audio-format=best
-            http://www.youtube.com/watch?v=""" + ytId)
+            http://www.youtube.com/watch?v=""" + yt_id)
             return True
 
         except KeyboardInterrupt:
@@ -67,9 +67,9 @@ class PlaylistDownloader:
             print('failed: %s'.format(e.strerror))
             return False
 
-    def fetchInfo(self, playlistId, start=1, limit=0):
+    def fetch_info(self, playlist_id, start=1, limit=0):
         connection = http.client.HTTPConnection('gdata.youtube.com')
-        connection.request('GET', '/feeds/api/playlists/' + str(playlistId) +
+        connection.request('GET', '/feeds/api/playlists/' + str(playlist_id) +
         '/?' + urllib.parse.urlencode({
                 'alt': 'json',
                 'max-results': limit,
@@ -86,7 +86,7 @@ class PlaylistDownloader:
         data = json.loads(data)
         return data
 
-    def createPath(self, path, title):
+    def create_path(self, path, title):
         title = title.replace('/', '')
         number = ''
 
@@ -115,7 +115,7 @@ if __name__ == '__main__':
             PLAYLIST_ID = sys.argv[1]
     downloader = PlaylistDownloader()
     if len(sys.argv) == 3:
-        downloader.setTarget(sys.argv[2] + '/')
+        downloader.set_target(sys.argv[2] + '/')
     else:
-        downloader.setTarget('./')
+        downloader.set_target('./')
     downloader.download(PLAYLIST_ID)
