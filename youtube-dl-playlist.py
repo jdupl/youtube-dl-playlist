@@ -29,7 +29,7 @@ class PlaylistDownloader:
         print('Getting playlist information ...')
         data = self.fetch_info(playlist_id)
         self.total_videos = int(data['feed']['openSearch$totalResults']['$t'])
-        print('Total videos to download: %d'.format(self.total_videos))
+        print('Total videos to download: {:d}'.format(self.total_videos))
         title = data['feed']['title']['$t']
         playlist_dir = self.create_path(self.target_dir, title)
         os.chdir(self.set_target(playlist_dir))
@@ -47,24 +47,27 @@ class PlaylistDownloader:
                 self.downloaded = self.downloaded + 1
 
     def download_entry(self, yt_id, yt_title):
-        print("%s(%s) %s".format(yt_id, str(self.downloaded).zfill(3), yt_title))
+        playlist_pos = str(self.downloaded).zfill(3)
+        print("{:s}({:s}) {:s}".format(yt_id, playlist_pos, yt_title))
 
         existing = glob.glob('*' + yt_id + '.*')
         filtered = [x for x in existing if not x.endswith('part')]
         if filtered.__len__() > 0:
             print('alreary exists, skipping...')
             return True
-
         try:
-            os.system("""youtube-dl -t --audio-format=best
-            http://www.youtube.com/watch?v=""" + yt_id)
+            url = 'http://www.youtube.com/watch?v={:s}'.format(yt_id)
+            file_name = '[{:s}]%(title)s[%(id)s].%(ext)s'.format(playlist_pos)
+            proc = 'youtube-dl --audio-format=best -o "{:s}" {:s}'.format(
+                file_name, url)
+            os.system(proc)
             return True
 
         except KeyboardInterrupt:
             sys.exit(1)
 
         except Exception as e:
-            print('failed: %s'.format(e.strerror))
+            print('failed: {:s}'.format(e.strerror))
             return False
 
     def fetch_info(self, playlist_id, start=1, limit=0):
@@ -83,7 +86,7 @@ class PlaylistDownloader:
             sys.exit(1)
 
         data = response.read()
-        data = json.loads(data)
+        data = json.loads(data.decode('utf8'))
         return data
 
     def create_path(self, path, title):
