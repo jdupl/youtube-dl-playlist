@@ -27,7 +27,7 @@ Install [youtube-dl-playlist](https://github.com/jordoncm/youtube-dl-playlist)
 
 Download the python file and save to /usr/local/bin/youtube-dl-channel
 
-`sudo curl https://raw.githubusercontent.com/jdupl/youtube-dl-channel/master/youtube-dl-playlist.py -o /usr/local/bin/youtube-dl-playlist`
+`sudo curl https://raw.githubusercontent.com/jdupl/youtube-dl-playlist/master/youtube-dl-playlist.py -o /usr/local/bin/youtube-dl-playlist`
 
 Give execute rights
 
