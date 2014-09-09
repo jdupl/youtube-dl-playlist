@@ -48,27 +48,8 @@ class PlaylistDownloader:
 
     def download_entry(self, yt_id, yt_title):
         playlist_pos = str(self.downloaded).zfill(3)
-        print("{:s}({:s}) {:s}".format(yt_id, playlist_pos, yt_title))
-
-        existing = glob.glob('*' + yt_id + '.*')
-        filtered = [x for x in existing if not x.endswith('part')]
-        if filtered.__len__() > 0:
-            print('alreary exists, skipping...')
-            return True
-        try:
-            url = 'http://www.youtube.com/watch?v={:s}'.format(yt_id)
-            file_name = '[{:s}]%(title)s[%(id)s].%(ext)s'.format(playlist_pos)
-            proc = 'youtube-dl --audio-format=best -o "{:s}" {:s}'.format(
-                file_name, url)
-            os.system(proc)
-            return True
-
-        except KeyboardInterrupt:
-            sys.exit(1)
-
-        except Exception as e:
-            print('failed: {:s}'.format(e.strerror))
-            return False
+        url = 'http://www.youtube.com/watch?v={:s}'.format(yt_id)
+        print("{:s} {:s}".format(url, yt_title))
 
     def fetch_info(self, playlist_id, start=1, limit=0):
         connection = http.client.HTTPConnection('gdata.youtube.com')
