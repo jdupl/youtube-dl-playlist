@@ -1,7 +1,7 @@
 # Project is deprecated
 ## Youtube-dl now embeds this feature !
 
-# youtube-dl-playlist
+## youtube-dl-playlist
 
 This utility allows you to download all the videos from a playlist on Youtube. 
 It creates a folder in the current directory (or in the specified path) named 
