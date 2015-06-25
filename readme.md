@@ -1,4 +1,4 @@
-# Project is depricated
+# Project is deprecated
 ## Youtube-dl now embeds this feature !
 
 # youtube-dl-playlist
