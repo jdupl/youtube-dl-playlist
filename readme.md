@@ -1,3 +1,6 @@
+# Project is depricated
+## Youtube-dl now embeds this feature !
+
 # youtube-dl-playlist
 
 This utility allows you to download all the videos from a playlist on Youtube. 
